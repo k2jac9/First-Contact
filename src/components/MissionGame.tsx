@@ -153,9 +153,9 @@ export const MissionGame: React.FC<MissionGameProps> = ({
     return () => window.clearInterval(timer);
   }, [replayPlaying, activeRecording, playbackSpeed, mode]);
 
-  // Trigger audio cues for frame events during live run
+  // Trigger audio cues for frame events during live run or replay
   useEffect(() => {
-    if (mode !== 'RUNNING' || !replayPlaying || !activeRecording) return;
+    if ((mode !== 'RUNNING' && mode !== 'REPLAY') || !replayPlaying || !activeRecording) return;
     if (frameIndex === lastTriggeredFrameRef.current) return;
     lastTriggeredFrameRef.current = frameIndex;
 
@@ -461,11 +461,9 @@ export const MissionGame: React.FC<MissionGameProps> = ({
   };
 
   const toggleSound = () => {
-    setSoundEnabled((prev) => {
-      const next = !prev;
-      missionAudio.setEnabled(next);
-      return next;
-    });
+    const next = !soundEnabled;
+    missionAudio.setEnabled(next);
+    setSoundEnabled(next);
   };
 
   const currentFrame = activeRecording

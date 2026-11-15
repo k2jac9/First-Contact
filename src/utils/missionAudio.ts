@@ -9,6 +9,7 @@ class MissionAudioEngine {
       if (this.ctx?.state === 'suspended') {
         void this.ctx.resume();
       }
+      this.tone(660, 0.08, 'sine', 0.06);
     }
   }
 
@@ -17,35 +18,35 @@ class MissionAudioEngine {
   }
 
   public playWaypointClick(): void {
-    this.tone(620, 0.05, 'sine', 0.04);
+    this.tone(620, 0.06, 'sine', 0.055);
   }
 
   public playLaunch(): void {
-    this.tone(330, 0.12, 'triangle', 0.06);
-    setTimeout(() => this.tone(495, 0.16, 'sine', 0.06), 80);
+    this.tone(330, 0.14, 'triangle', 0.08);
+    setTimeout(() => this.tone(495, 0.18, 'sine', 0.08), 80);
   }
 
   public playScan(): void {
-    this.tone(880, 0.11, 'sine', 0.05);
+    this.tone(880, 0.12, 'sine', 0.07);
   }
 
   public playSample(): void {
-    this.tone(523.25, 0.09, 'sine', 0.05);
-    setTimeout(() => this.tone(659.25, 0.14, 'sine', 0.05), 75);
+    this.tone(523.25, 0.1, 'sine', 0.07);
+    setTimeout(() => this.tone(659.25, 0.16, 'sine', 0.07), 75);
   }
 
   public playSlipWarning(): void {
-    this.tone(196, 0.14, 'sawtooth', 0.035);
+    this.tone(220, 0.16, 'sawtooth', 0.055);
   }
 
   public playOutcome(success: boolean): void {
     if (success) {
-      this.tone(523.25, 0.14, 'sine', 0.06);
-      setTimeout(() => this.tone(659.25, 0.16, 'sine', 0.06), 95);
-      setTimeout(() => this.tone(783.99, 0.24, 'sine', 0.06), 190);
+      this.tone(523.25, 0.14, 'sine', 0.08);
+      setTimeout(() => this.tone(659.25, 0.16, 'sine', 0.08), 95);
+      setTimeout(() => this.tone(783.99, 0.24, 'sine', 0.08), 190);
     } else {
-      this.tone(246.94, 0.16, 'triangle', 0.06);
-      setTimeout(() => this.tone(196.0, 0.24, 'triangle', 0.06), 110);
+      this.tone(246.94, 0.16, 'triangle', 0.08);
+      setTimeout(() => this.tone(196.0, 0.24, 'triangle', 0.08), 110);
     }
   }
 
@@ -62,6 +63,9 @@ class MissionAudioEngine {
     if (!this.enabled) return;
     this.ensureCtx();
     if (!this.ctx) return;
+    if (this.ctx.state === 'suspended') {
+      void this.ctx.resume();
+    }
     const now = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();

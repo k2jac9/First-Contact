@@ -547,19 +547,36 @@ async function startServer() {
       }
 
       const ai = getAiClient();
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-transcribe',
-        contents: {
-          parts: [
-            { inlineData: { mimeType, data: audioBase64 } },
-            { text: prompt?.trim() || 'Transcribe this narration audio verbatim with natural punctuation.' },
-          ],
-        },
-      });
+      const contents = {
+        parts: [
+          { inlineData: { mimeType, data: audioBase64 } },
+          { text: prompt?.trim() || 'Transcribe this narration audio verbatim with natural punctuation.' },
+        ],
+      };
+
+      let modelUsed = 'gemini-3.5-transcribe';
+      let response;
+      try {
+        response = await ai.models.generateContent({
+          model: modelUsed,
+          contents,
+        });
+      } catch (primaryErr) {
+        const msg = primaryErr instanceof Error ? primaryErr.message : String(primaryErr);
+        if (/404|NOT_FOUND/i.test(msg)) {
+          modelUsed = 'gemini-4-hydrogen';
+          response = await ai.models.generateContent({
+            model: modelUsed,
+            contents,
+          });
+        } else {
+          throw primaryErr;
+        }
+      }
 
       res.json({
         transcript: (response.text ?? '').trim(),
-        model: 'gemini-3.5-transcribe',
+        model: modelUsed,
       });
     } catch (err) {
       const { status, message } = extractErrorDetails(err);

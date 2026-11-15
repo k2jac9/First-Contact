@@ -136,13 +136,22 @@ export default function App() {
     }
   };
 
-  const handleToggleMute = () => {
-    setIsMuted((prev) => {
-      const nextMuted = !prev;
-      conceptScore.setEnabled(!nextMuted);
+  useEffect(() => {
+    conceptScore.setEnabled(activeTab === 'film' && !isMuted);
+    if (activeTab === 'film' && !isMuted) {
       conceptScore.updateForScene(scene.kind);
-      return nextMuted;
-    });
+    }
+  }, [activeTab, isMuted, scene.kind]);
+
+  const handleToggleMute = () => {
+    const nextMuted = !isMuted;
+    if (activeTab === 'film') {
+      conceptScore.setEnabled(!nextMuted);
+      if (!nextMuted) {
+        conceptScore.updateForScene(scene.kind);
+      }
+    }
+    setIsMuted(nextMuted);
   };
 
   const handleJumpToScene = (target: FilmScene) => {

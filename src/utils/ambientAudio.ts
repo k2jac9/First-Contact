@@ -29,10 +29,11 @@ class ConceptScoreEngine {
         void this.ctx.resume();
       }
       if (this.masterGain && this.ctx) {
-        this.masterGain.gain.setTargetAtTime(0.14, this.ctx.currentTime, 0.2);
+        this.masterGain.gain.setTargetAtTime(0.26, this.ctx.currentTime, 0.15);
+        this.triggerCue(523.25, 0.16);
       }
     } else if (this.masterGain && this.ctx) {
-      this.masterGain.gain.setTargetAtTime(0.0, this.ctx.currentTime, 0.15);
+      this.masterGain.gain.setTargetAtTime(0.0, this.ctx.currentTime, 0.12);
     }
   }
 
@@ -50,49 +51,49 @@ class ConceptScoreEngine {
 
     switch (kind) {
       case 'earth':
-        this.droneOsc.frequency.setTargetAtTime(65.41, now, 0.6); // C2
-        this.harmonicOsc.frequency.setTargetAtTime(196.0, now, 0.6); // G3
-        this.filter.frequency.setTargetAtTime(340, now, 0.5);
+        this.droneOsc.frequency.setTargetAtTime(130.81, now, 0.5); // C3
+        this.harmonicOsc.frequency.setTargetAtTime(196.0, now, 0.5); // G3
+        this.filter.frequency.setTargetAtTime(580, now, 0.4);
         break;
       case 'moon':
-        this.droneOsc.frequency.setTargetAtTime(73.42, now, 0.5); // D2
+        this.droneOsc.frequency.setTargetAtTime(146.83, now, 0.5); // D3
         this.harmonicOsc.frequency.setTargetAtTime(220.0, now, 0.5); // A3
-        this.filter.frequency.setTargetAtTime(420, now, 0.5);
-        if (isTransition) this.triggerCue(880, 0.08);
+        this.filter.frequency.setTargetAtTime(640, now, 0.4);
+        if (isTransition) this.triggerCue(880, 0.12);
         break;
       case 'mars-failure':
-        this.droneOsc.frequency.setTargetAtTime(58.27, now, 0.4); // Bb1 tension
+        this.droneOsc.frequency.setTargetAtTime(116.54, now, 0.4); // Bb2 tension
         this.harmonicOsc.frequency.setTargetAtTime(174.61, now, 0.4); // F3
-        this.filter.frequency.setTargetAtTime(260, now, 0.4);
-        if (isTransition) this.triggerCue(311.13, 0.12);
+        this.filter.frequency.setTargetAtTime(420, now, 0.4);
+        if (isTransition) this.triggerCue(311.13, 0.16);
         break;
       case 'atlas':
-        this.droneOsc.frequency.setTargetAtTime(65.41, now, 0.4);
+        this.droneOsc.frequency.setTargetAtTime(130.81, now, 0.4);
         this.harmonicOsc.frequency.setTargetAtTime(261.63, now, 0.4); // C4
-        this.filter.frequency.setTargetAtTime(480, now, 0.4);
-        if (isTransition) this.triggerCue(1046.5, 0.05);
+        this.filter.frequency.setTargetAtTime(720, now, 0.4);
+        if (isTransition) this.triggerCue(1046.5, 0.08);
         break;
       case 'generative':
-        this.droneOsc.frequency.setTargetAtTime(73.42, now, 0.4);
+        this.droneOsc.frequency.setTargetAtTime(146.83, now, 0.4);
         this.harmonicOsc.frequency.setTargetAtTime(293.66, now, 0.4); // D4
-        this.filter.frequency.setTargetAtTime(560, now, 0.4);
-        if (isTransition) this.triggerCue(783.99, 0.06);
+        this.filter.frequency.setTargetAtTime(780, now, 0.4);
+        if (isTransition) this.triggerCue(783.99, 0.09);
         break;
       case 'training':
-        this.droneOsc.frequency.setTargetAtTime(82.41, now, 0.4); // E2
+        this.droneOsc.frequency.setTargetAtTime(164.81, now, 0.4); // E3
         this.harmonicOsc.frequency.setTargetAtTime(329.63, now, 0.4); // E4
-        this.filter.frequency.setTargetAtTime(620, now, 0.4);
+        this.filter.frequency.setTargetAtTime(840, now, 0.4);
         break;
       case 'mars-retry':
-        this.droneOsc.frequency.setTargetAtTime(65.41, now, 0.5); // Warm C2 resolution
+        this.droneOsc.frequency.setTargetAtTime(130.81, now, 0.5); // C3 resolution
         this.harmonicOsc.frequency.setTargetAtTime(392.0, now, 0.6); // G4
-        this.filter.frequency.setTargetAtTime(780, now, 0.6);
-        if (isTransition) this.triggerCue(523.25, 0.14);
+        this.filter.frequency.setTargetAtTime(920, now, 0.6);
+        if (isTransition) this.triggerCue(523.25, 0.18);
         break;
       case 'title':
-        this.droneOsc.frequency.setTargetAtTime(65.41, now, 0.8);
+        this.droneOsc.frequency.setTargetAtTime(130.81, now, 0.8);
         this.harmonicOsc.frequency.setTargetAtTime(261.63, now, 0.8);
-        this.filter.frequency.setTargetAtTime(280, now, 1.0);
+        this.filter.frequency.setTargetAtTime(440, now, 1.0);
         break;
     }
   }
@@ -119,21 +120,21 @@ class ConceptScoreEngine {
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.value = 340;
+    filter.frequency.value = 580;
 
     const droneOsc = ctx.createOscillator();
-    droneOsc.type = 'sawtooth';
-    droneOsc.frequency.value = 65.41;
+    droneOsc.type = 'triangle';
+    droneOsc.frequency.value = 130.81;
 
     const droneGain = ctx.createGain();
-    droneGain.gain.value = 0.25;
+    droneGain.gain.value = 0.28;
 
     const harmonicOsc = ctx.createOscillator();
     harmonicOsc.type = 'sine';
     harmonicOsc.frequency.value = 196.0;
 
     const harmonicGain = ctx.createGain();
-    harmonicGain.gain.value = 0.2;
+    harmonicGain.gain.value = 0.24;
 
     droneOsc.connect(droneGain);
     harmonicOsc.connect(harmonicGain);

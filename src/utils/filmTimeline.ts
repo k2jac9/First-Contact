@@ -161,15 +161,23 @@ const AVOID_RULES: Array<{ pattern: RegExp; rule: string }> = [
   { pattern: /\b(morphing terrain|melting terrain)\b/i, rule: 'Do not morph or melt terrain during physical rollouts.' },
 ];
 
+const NEGATION_PREFIX_RE = /\b(?:no|not|without|zero|avoid|never|free of)\b(?:\s+[a-z0-9-]+){0,3}\s*$/i;
+
 export function auditAvoidRules(promptText: string): AvoidAuditFinding[] {
   const findings: AvoidAuditFinding[] = [];
   for (const item of AVOID_RULES) {
-    const match = promptText.match(item.pattern);
-    if (match) {
+    const globalPattern = new RegExp(item.pattern.source, item.pattern.flags.includes('g') ? item.pattern.flags : `${item.pattern.flags}g`);
+    for (const match of promptText.matchAll(globalPattern)) {
+      const idx = match.index ?? 0;
+      const prefix = promptText.slice(Math.max(0, idx - 48), idx);
+      if (NEGATION_PREFIX_RE.test(prefix)) {
+        continue;
+      }
       findings.push({
         rule: item.rule,
         matchedTerm: match[0],
       });
+      break;
     }
   }
   return findings;

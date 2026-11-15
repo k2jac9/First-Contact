@@ -59,9 +59,17 @@ test('filterAtlasEpisodes supports semantic token match and approval gating', ()
   assert.equal(approvedOnly.some((ep) => ep.id === 'ep-0104'), false);
 });
 
-test('auditAvoidRules flags prohibited film visual tropes', () => {
+test('auditAvoidRules flags prohibited film visual tropes and respects clean storyboard prompts', () => {
   const clean = auditAvoidRules('Four-wheel Scout rover on rocky Mars ridge with crisp shadows.');
   assert.equal(clean.length, 0);
+
+  for (const scene of FILM_SCENES) {
+    const sceneFindings = auditAvoidRules(scene.generationPrompt);
+    assert.equal(sceneFindings.length, 0, `Expected clean prompt for ${scene.id}`);
+  }
+
+  const negated = auditAvoidRules('Clean dark telemetry console without decorative hologram clutter.');
+  assert.equal(negated.length, 0);
 
   const flagged = auditAvoidRules('Lunar haze blowing wind dust under a giant planet with floating code.');
   assert.equal(flagged.length, 3);

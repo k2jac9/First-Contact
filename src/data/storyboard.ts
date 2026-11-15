@@ -166,7 +166,7 @@ export const FILM_SCENES: FilmScene[] = [
     audioCue: 'Clean precision interface cue over restrained low synth bed.',
     imagePath: GENERATED_ASSETS.marsBoulder,
     generationPrompt:
-      'Restrained dark aerospace episode review workstation showing Mars rover recovery thumbnail, wheel-speed and forward-progress telemetry graphs, and provenance metadata without decorative hologram clutter.',
+      'Restrained dark aerospace episode review workstation showing Mars rover recovery thumbnail, wheel-speed and forward-progress telemetry graphs, and provenance metadata on flat matte interface panels with crisp orthographic typography.',
   },
   {
     id: 'scene-5-generative',

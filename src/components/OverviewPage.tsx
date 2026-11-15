@@ -9,6 +9,7 @@ import {
   Play,
 } from 'lucide-react';
 import { WorkspaceTab } from './TopBar';
+import { OverviewPitchVideo } from './OverviewPitchVideo';
 import { PresenterDeck } from './PresenterDeck';
 
 interface OverviewPageProps {
@@ -157,6 +158,9 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
 
   return (
     <div className="space-y-12">
+      {/* 0. 30-Second Project Pitch Video */}
+      <OverviewPitchVideo />
+
       {/* 1. Hero & Core Thesis */}
       <section className="border-b border-slate-800/80 pb-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end">

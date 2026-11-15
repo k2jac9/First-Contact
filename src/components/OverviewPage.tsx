@@ -9,6 +9,7 @@ import {
   Play,
 } from 'lucide-react';
 import { WorkspaceTab } from './TopBar';
+import { PresenterDeck } from './PresenterDeck';
 
 interface OverviewPageProps {
   onSelectTab: (tab: WorkspaceTab) => void;
@@ -397,6 +398,9 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({
           </ul>
         </div>
       </section>
+
+      {/* 5. Password-Gated 7-Slide Presenter Deck */}
+      <PresenterDeck onSelectTab={onSelectTab} onStartDemo={onStartDemo} />
     </div>
   );
 };

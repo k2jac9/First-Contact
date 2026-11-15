@@ -1,12 +1,12 @@
 import 'dotenv/config';
-import express, { Request, Response } from 'express';
+import express from 'express';
+import type { Request, Response } from 'express';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
-import { createServer as createViteServer } from 'vite';
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 function getAiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -71,7 +71,7 @@ Editorial rules:
 - Earth: NASA-derived terrain -> simulated environment mesh reveal.
 - Moon: hard directional light, black sky, ballistic dust, zero airborne wind or haze.
 - Mars Failure (00:16) & Retry (00:48): exact same split basalt boulder beside shallow sandy rut and locked camera start; retry shows Carrier taking wider firm-ground route at reduced speed.
-- MongoDB Atlas (00:24): semantic search for Mars rover recoveries after wheel slip, pinned failed run beside reviewed approved recovery with synchronized traces and provenance.
+- Atlas (00:24): semantic search for Mars rover recoveries after wheel slip, pinned failed run beside reviewed approved recovery with synchronized traces and provenance.
 - Generative AI (00:32): three match cuts (sun angle, one generated obstacle, planned route) on fixed elevated camera without terrain melting during rollouts.
 - Avoid: extra wheels, floating wheels, lunar haze/wind dust, giant nearby planets, fake vendor logos, decorative hologram clutter, or fabricated performance statistics.
 
@@ -793,12 +793,15 @@ async function startServer() {
   });
 
   if (process.env.NODE_ENV === 'production') {
+    const assetsImagesDir = path.resolve(process.cwd(), 'src/assets/images');
+    app.use('/src/assets/images', express.static(assetsImagesDir));
     const distDir = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distDir));
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distDir, 'index.html'));
     });
   } else {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

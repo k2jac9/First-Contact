@@ -30,8 +30,20 @@ import {
   simulateMission,
 } from '../utils/missionSimulation';
 import { MissionCanvas } from './MissionCanvas';
+import { MissionDemoDirectiveKind } from './DemoWalkthrough';
 import { SafeImage } from './SafeImage';
 import { TelemetryTraceChart } from './TelemetryTraceChart';
+
+export interface MissionDemoDirective {
+  seq: number;
+  kind: MissionDemoDirectiveKind;
+}
+
+interface MissionGameProps {
+  demoDirective?: MissionDemoDirective | null;
+  onStartDemo?: () => void;
+  demoActive?: boolean;
+}
 
 const STORAGE_KEY = 'ra-mission-recordings-v1';
 
@@ -41,18 +53,36 @@ function buildSeedRecordings(): MissionRecording[] {
   return [simulateMission(mars, riskyPlan, 'Baseline Attempt · Direct Fast Push')];
 }
 
+function deduplicateRecordingIds(items: MissionRecording[]): MissionRecording[] {
+  const seen = new Set<string>();
+  return items.map((item, idx) => {
+    let uniqueId = item.id;
+    if (seen.has(uniqueId)) {
+      uniqueId = `${item.id}-dup-${idx}`;
+    }
+    seen.add(uniqueId);
+    return uniqueId === item.id ? item : { ...item, id: uniqueId };
+  });
+}
+
 function loadSavedRecordings(): MissionRecording[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return buildSeedRecordings();
     const parsed = JSON.parse(raw) as MissionRecording[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : buildSeedRecordings();
+    return Array.isArray(parsed) && parsed.length > 0
+      ? deduplicateRecordingIds(parsed)
+      : buildSeedRecordings();
   } catch {
     return buildSeedRecordings();
   }
 }
 
-export const MissionGame: React.FC = () => {
+export const MissionGame: React.FC<MissionGameProps> = ({
+  demoDirective = null,
+  onStartDemo,
+  demoActive = false,
+}) => {
   const [destinationId, setDestinationId] = useState<DestinationId>('mars');
   const destination: DestinationConfig = useMemo(
     () => getDestinationById(destinationId),
@@ -139,10 +169,85 @@ export const MissionGame: React.FC = () => {
     if (frame.sampledIds.length > (prevFrame?.sampledIds.length ?? 0)) {
       missionAudio.playSample();
     }
-    if (frame.slipRatio >= 0.62 && (prevFrame?.slipRatio ?? 0) < 0.62) {
+    if (frame.slipRatio >= 0.54 && (prevFrame?.slipRatio ?? 0) < 0.54) {
       missionAudio.playSlipWarning();
     }
   }, [frameIndex, mode, replayPlaying, activeRecording]);
+
+  // Execute external guided-demo stage directives
+  useEffect(() => {
+    if (!demoDirective) return;
+    const mars = getDestinationById('mars');
+
+    if (demoDirective.kind === 'MARS_PLAN_RISKY') {
+      setDestinationId('mars');
+      setCommands(createPresetCommands(mars, 'direct-risky'));
+      setPlanLabel('Direct Fast Route');
+      setShowMeshOverlay(true);
+      setAiRationale(null);
+      setAiError(null);
+      setMode('PLANNING');
+      setActiveRecording(null);
+      setReplayPlaying(false);
+      setFrameIndex(0);
+    } else if (demoDirective.kind === 'MARS_RUN_RISKY') {
+      const risky = createPresetCommands(mars, 'direct-risky');
+      const simulated = simulateMission(mars, risky, 'Demo Run 1 · Direct Fast Push');
+      const rec: MissionRecording = {
+        ...simulated,
+        id: `${simulated.id}-${Date.now()}-demo1`,
+      };
+      setDestinationId('mars');
+      setCommands(risky);
+      setPlanLabel('Direct Fast Route');
+      setShowMeshOverlay(true);
+      setActiveRecording(rec);
+      setRecordings((prev) => [rec, ...prev].slice(0, 12));
+      setPlaybackSpeed(2);
+      setFrameIndex(0);
+      lastTriggeredFrameRef.current = -1;
+      setMode('RUNNING');
+      setReplayPlaying(true);
+    } else if (demoDirective.kind === 'MARS_REPLAY_SLIP') {
+      const risky = createPresetCommands(mars, 'direct-risky');
+      const existingRisky =
+        activeRecording && activeRecording.destinationId === 'mars' && activeRecording.outcome === 'STALLED_SLIP'
+          ? activeRecording
+          : {
+              ...simulateMission(mars, risky, 'Demo Run 1 · Direct Fast Push'),
+              id: `rec-demo-slip-${Date.now()}`,
+            };
+      setDestinationId('mars');
+      setCommands(existingRisky.commands);
+      setPlanLabel(existingRisky.planLabel);
+      setActiveRecording(existingRisky);
+      setMode('REPLAY');
+      setReplayPlaying(false);
+      const slipEv = existingRisky.events.find((e) => e.kind === 'SLIP') ?? existingRisky.events[existingRisky.events.length - 1];
+      const targetIdx = slipEv
+        ? existingRisky.frames.findIndex((f) => f.t >= slipEv.t)
+        : Math.max(0, existingRisky.frames.length - 2);
+      setFrameIndex(targetIdx >= 0 ? targetIdx : 0);
+    } else if (demoDirective.kind === 'MARS_RUN_SAFE') {
+      const safe = createPresetCommands(mars, 'safe-bypass');
+      const simulated = simulateMission(mars, safe, 'Demo Run 2 · Safe Bypass Route');
+      const rec: MissionRecording = {
+        ...simulated,
+        id: `${simulated.id}-${Date.now()}-demo2`,
+      };
+      setDestinationId('mars');
+      setCommands(safe);
+      setPlanLabel('Safe Bypass Route');
+      setShowMeshOverlay(true);
+      setActiveRecording(rec);
+      setRecordings((prev) => [rec, ...prev].slice(0, 12));
+      setPlaybackSpeed(4);
+      setFrameIndex(0);
+      lastTriggeredFrameRef.current = -1;
+      setMode('RUNNING');
+      setReplayPlaying(true);
+    }
+  }, [demoDirective]);
 
   const handleSelectDestination = (nextId: DestinationId) => {
     const nextDest = getDestinationById(nextId);
@@ -222,7 +327,11 @@ export const MissionGame: React.FC = () => {
   };
 
   const handleLaunchMission = () => {
-    const rec = simulateMission(destination, commands, planLabel);
+    const simulated = simulateMission(destination, commands, planLabel);
+    const rec: MissionRecording = {
+      ...simulated,
+      id: `${simulated.id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    };
     setActiveRecording(rec);
     setRecordings((prev) => [rec, ...prev].slice(0, 12));
     setFrameIndex(0);
@@ -400,6 +509,21 @@ export const MissionGame: React.FC = () => {
             <p className="mt-2 text-sm leading-relaxed text-slate-400">
               Choose a planetary destination, design a structured rover command sequence, launch the deterministic simulation, and replay mission recordings to refine your next attempt.
             </p>
+            {onStartDemo && !demoActive && (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={onStartDemo}
+                  className="inline-flex items-center gap-2 rounded-md bg-cyan-500 px-4 py-2 text-xs font-semibold text-slate-950 transition-colors hover:bg-cyan-400 whitespace-nowrap shrink-0"
+                >
+                  <Play className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Start Guided Demo</span>
+                </button>
+                <span className="text-xs text-slate-400">
+                  6-step interactive tour · Plan → Slip Failure → Replay → Atlas → Safe Bypass → Concept Film
+                </span>
+              </div>
+            )}
           </div>
           <div className="shrink-0 font-mono text-xs text-slate-400 tabular-nums">
             Synthetic deterministic rover motion · Educational mission prototype

@@ -57,7 +57,7 @@ export const AtlasAndGrounding: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: 'gemini-4-carbon',
-          prompt: `Review our MongoDB Atlas concept episode selection for Scene 4 & 6. Pinned failure is Episode 0142 (Mars wheel slip in sandy rut next to split basalt boulder). Selected recovery is ${selectedEp.episodeCode} (${selectedEp.summary}). Explain cleanly how Atlas connects evidence provenance to Dataset v02 curation without inventing fake metrics.`,
+          prompt: `Review our Atlas concept episode selection for Scene 4 & 6. Pinned failure is Episode 0142 (Mars wheel slip in sandy rut next to split basalt boulder). Selected recovery is ${selectedEp.episodeCode} (${selectedEp.summary}). Explain cleanly how Atlas connects evidence provenance to Dataset v02 curation without inventing fake metrics.`,
         }),
       });
       const data = await res.json();
@@ -142,19 +142,19 @@ export const AtlasAndGrounding: React.FC = () => {
           Atlas Episode Review & Terrain Grounding
         </h1>
         <p className="mt-1 text-sm text-slate-400">
-          Explore mission learning progression, the concept MongoDB Atlas evidence query, and live Google Search and Maps terrain research.
+          Explore mission learning progression, the concept Atlas evidence query, and live Google Search and Maps terrain research.
         </p>
       </div>
 
       {/* 1. Recharts Mission Learning Progression Dashboard */}
       <MissionLearningDashboard />
 
-      {/* 2. Interactive MongoDB Atlas Concept Episode Explorer */}
+      {/* 2. Interactive Atlas Concept Episode Explorer */}
       <section aria-labelledby="atlas-explorer-heading" className="space-y-4 rounded-lg border border-slate-800 bg-[#0B0F17] p-5">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div>
             <h2 id="atlas-explorer-heading" className="font-display text-base font-semibold text-slate-100">
-              MongoDB Atlas · Concept Episode Review
+              Atlas · Concept Episode Review
             </h2>
             <p className="text-xs text-slate-400">
               Semantic experience retrieval · Not every retrieved mission interval is eligible for control training

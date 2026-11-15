@@ -59,7 +59,7 @@ export const DirectorAndAudio: React.FC = () => {
     {
       id: 'init-1',
       role: 'model',
-      text: 'Continuity supervisor online. Ask about Scout (4-wheel) and Carrier (6-wheel) shot framing, MongoDB Atlas interval retrieval, or 24 fps timing across the 1,440-frame cut.',
+      text: 'Continuity supervisor online. Ask about Scout (4-wheel) and Carrier (6-wheel) shot framing, Atlas interval retrieval, or 24 fps timing across the 1,440-frame cut.',
       modelUsed: 'System Brief',
     },
   ]);

@@ -111,7 +111,7 @@ export const ConceptFilmPlayer: React.FC<ConceptFilmPlayerProps> = ({
           <div className="flex h-full w-full flex-col justify-between overflow-hidden bg-[#080B12] p-3.5 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
               <div className="flex items-center gap-2 text-xs sm:text-sm">
-                <span className="font-semibold text-emerald-400">MongoDB Atlas</span>
+                <span className="font-semibold text-emerald-400">Atlas</span>
                 <span className="text-slate-600" aria-hidden="true">|</span>
                 <span className="font-mono text-slate-200">
                   Find Mars rover recoveries after wheel slip

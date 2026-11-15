@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AtlasAndGrounding } from './components/AtlasAndGrounding';
 import { ConceptFilmPlayer } from './components/ConceptFilmPlayer';
+import { DEMO_STAGES, DemoWalkthrough } from './components/DemoWalkthrough';
 import { DirectorAndAudio } from './components/DirectorAndAudio';
 import { MediaStudio } from './components/MediaStudio';
-import { MissionGame } from './components/MissionGame';
+import { MissionDemoDirective, MissionGame } from './components/MissionGame';
 import { StoryboardRail } from './components/StoryboardRail';
 import { TopBar, WorkspaceTab } from './components/TopBar';
 import { FILM_DURATION_SEC, FilmScene } from './data/storyboard';
@@ -16,6 +17,11 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [studioSeedScene, setStudioSeedScene] = useState<FilmScene | null>(null);
+
+  // End-to-End Guided Demo State
+  const [demoStageIndex, setDemoStageIndex] = useState<number | null>(null);
+  const [demoAutoPlay, setDemoAutoPlay] = useState<boolean>(false);
+  const [demoDirective, setDemoDirective] = useState<MissionDemoDirective | null>(null);
 
   const rafRef = useRef<number | null>(null);
   const lastTsRef = useRef<number | null>(null);
@@ -61,6 +67,52 @@ export default function App() {
   useEffect(() => {
     return () => conceptScore.dispose();
   }, []);
+
+  const applyDemoStage = useCallback((idx: number) => {
+    const clamped = Math.max(0, Math.min(DEMO_STAGES.length - 1, idx));
+    const stage = DEMO_STAGES[clamped];
+    setDemoStageIndex(clamped);
+    setActiveTab(stage.tab);
+
+    if (stage.missionDirective) {
+      setDemoDirective({
+        seq: Date.now() + clamped,
+        kind: stage.missionDirective,
+      });
+    }
+
+    if (stage.tab === 'film') {
+      setCurrentTime(stage.filmSeekSec ?? 0);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(false);
+    }
+  }, []);
+
+  const handleStartDemo = () => {
+    setDemoAutoPlay(false);
+    applyDemoStage(0);
+  };
+
+  const handleExitDemo = () => {
+    setDemoStageIndex(null);
+    setDemoAutoPlay(false);
+    setIsPlaying(false);
+  };
+
+  // Auto-advance demo timer when Auto-Play is active
+  useEffect(() => {
+    if (demoStageIndex === null || !demoAutoPlay) return;
+    if (demoStageIndex >= DEMO_STAGES.length - 1) {
+      setDemoAutoPlay(false);
+      return;
+    }
+    const dwell = DEMO_STAGES[demoStageIndex].autoDurationMs;
+    const timer = window.setTimeout(() => {
+      applyDemoStage(demoStageIndex + 1);
+    }, dwell);
+    return () => window.clearTimeout(timer);
+  }, [demoStageIndex, demoAutoPlay, applyDemoStage]);
 
   const handleTogglePlay = () => {
     setIsPlaying((prev) => {
@@ -113,11 +165,29 @@ export default function App() {
       <TopBar
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
-        onPlayFullCut={handlePlayFullCut}
-        isPlaying={isPlaying}
+        onToggleDemo={() => {
+          if (demoStageIndex !== null) {
+            handleExitDemo();
+          } else {
+            handleStartDemo();
+          }
+        }}
+        demoActive={demoStageIndex !== null}
       />
 
       <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
+        {demoStageIndex !== null && (
+          <DemoWalkthrough
+            activeStageIndex={demoStageIndex}
+            autoPlay={demoAutoPlay}
+            onPrev={() => applyDemoStage(demoStageIndex - 1)}
+            onNext={() => applyDemoStage(demoStageIndex + 1)}
+            onSelectStage={(idx) => applyDemoStage(idx)}
+            onToggleAutoPlay={() => setDemoAutoPlay((v) => !v)}
+            onExit={handleExitDemo}
+          />
+        )}
+
         {activeTab === 'film' && (
           <div className="space-y-10">
             <div className="flex flex-col justify-between gap-4 border-b border-slate-800/80 pb-5 md:flex-row md:items-end">
@@ -155,7 +225,13 @@ export default function App() {
           </div>
         )}
 
-        {activeTab === 'game' && <MissionGame />}
+        {activeTab === 'game' && (
+          <MissionGame
+            demoDirective={demoDirective}
+            onStartDemo={handleStartDemo}
+            demoActive={demoStageIndex !== null}
+          />
+        )}
         {activeTab === 'media' && <MediaStudio initialScene={studioSeedScene} />}
         {activeTab === 'grounding' && <AtlasAndGrounding />}
         {activeTab === 'director' && <DirectorAndAudio />}

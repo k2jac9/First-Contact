@@ -5,8 +5,8 @@ export type WorkspaceTab = 'game' | 'film' | 'media' | 'grounding' | 'director';
 interface TopBarProps {
   activeTab: WorkspaceTab;
   onSelectTab: (tab: WorkspaceTab) => void;
-  onPlayFullCut: () => void;
-  isPlaying: boolean;
+  onToggleDemo: () => void;
+  demoActive: boolean;
 }
 
 const NAV_ITEMS: Array<{ id: WorkspaceTab; label: string }> = [
@@ -20,8 +20,8 @@ const NAV_ITEMS: Array<{ id: WorkspaceTab; label: string }> = [
 export const TopBar: React.FC<TopBarProps> = ({
   activeTab,
   onSelectTab,
-  onPlayFullCut,
-  isPlaying,
+  onToggleDemo,
+  demoActive,
 }) => {
   return (
     <header className="border-b border-slate-800 bg-[#07090E]/95 backdrop-blur-sm md:sticky md:top-0 md:z-30">
@@ -70,10 +70,14 @@ export const TopBar: React.FC<TopBarProps> = ({
         <div className="order-2 shrink-0 md:order-3">
           <button
             type="button"
-            onClick={onPlayFullCut}
-            className="rounded-md bg-cyan-500 px-4 py-2 text-xs font-semibold tracking-wide text-slate-950 transition-colors duration-150 hover:bg-cyan-400 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
+            onClick={onToggleDemo}
+            className={`rounded-md px-4 py-2 text-xs font-semibold tracking-wide transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 ${
+              demoActive
+                ? 'border border-cyan-500/50 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25'
+                : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400'
+            }`}
           >
-            {isPlaying && activeTab === 'film' ? 'Pause Cut' : 'Play 60s Cut'}
+            {demoActive ? 'Exit Demo' : 'Start Guided Demo'}
           </button>
         </div>
       </div>

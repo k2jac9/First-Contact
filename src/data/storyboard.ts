@@ -247,7 +247,7 @@ export const FILM_SCENES: FilmScene[] = [
     overlayDirection: 'Hold clean near-black end card legibly for all 4 seconds (96 frames).',
     narration: 'Rocket Academy. First Contact.',
     visualDirection:
-      'Clean, nearly black end card held for 4 seconds with crisp typography and small Concept visualization footer.',
+      'Clean, nearly black end card held for 4 seconds with crisp centered typography.',
     cameraMove: 'Static hold (96 frames).',
     audioCue: 'Sustained warm chord decay into quiet silence.',
     generationPrompt:

@@ -103,9 +103,6 @@ export const ConceptFilmPlayer: React.FC<ConceptFilmPlayerProps> = ({
             <p className="mt-6 max-w-xl text-sm text-slate-300 sm:text-base">
               Create worlds. Train robots. Learn from every mission.
             </p>
-            <p className="mt-10 text-xs tracking-wide text-slate-500">
-              Concept visualization
-            </p>
           </div>
         ) : scene.kind === 'atlas' ? (
           <div className="flex h-full w-full flex-col justify-between overflow-hidden bg-[#080B12] p-3.5 sm:p-5">
@@ -313,9 +310,6 @@ export const ConceptFilmPlayer: React.FC<ConceptFilmPlayerProps> = ({
                   </p>
                 )}
               </div>
-              <span className="font-mono text-[11px] text-slate-300/90">
-                Concept visualization
-              </span>
             </div>
           </div>
         )}

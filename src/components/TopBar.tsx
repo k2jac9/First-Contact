@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type WorkspaceTab = 'game' | 'film' | 'media' | 'grounding' | 'director';
+export type WorkspaceTab = 'game' | 'overview' | 'film' | 'media' | 'grounding' | 'director';
 
 interface TopBarProps {
   activeTab: WorkspaceTab;
@@ -11,6 +11,7 @@ interface TopBarProps {
 
 const NAV_ITEMS: Array<{ id: WorkspaceTab; label: string }> = [
   { id: 'game', label: 'Mission Game' },
+  { id: 'overview', label: 'Overview' },
   { id: 'film', label: 'Concept Film' },
   { id: 'media', label: 'Scene Studio' },
   { id: 'grounding', label: 'Atlas & Terrain' },

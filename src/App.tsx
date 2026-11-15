@@ -5,6 +5,7 @@ import { DEMO_STAGES, DemoWalkthrough } from './components/DemoWalkthrough';
 import { DirectorAndAudio } from './components/DirectorAndAudio';
 import { MediaStudio } from './components/MediaStudio';
 import { MissionDemoDirective, MissionGame } from './components/MissionGame';
+import { OverviewPage } from './components/OverviewPage';
 import { StoryboardRail } from './components/StoryboardRail';
 import { TopBar, WorkspaceTab } from './components/TopBar';
 import { FILM_DURATION_SEC, FilmScene } from './data/storyboard';
@@ -239,6 +240,12 @@ export default function App() {
             demoDirective={demoDirective}
             onStartDemo={handleStartDemo}
             demoActive={demoStageIndex !== null}
+          />
+        )}
+        {activeTab === 'overview' && (
+          <OverviewPage
+            onSelectTab={handleSelectTab}
+            onStartDemo={handleStartDemo}
           />
         )}
         {activeTab === 'media' && <MediaStudio initialScene={studioSeedScene} />}

@@ -198,14 +198,14 @@ async function startServer() {
     }
   });
 
-  // 4. High-Quality Image Generation (gemini-3-pro-image-preview / gemini-nano-banana-2.1)
+  // 4. High-Quality Image Generation (gemini-3-pro-image / gemini-nano-banana-2.1)
   app.post('/api/gemini/generate-image', async (req: Request, res: Response) => {
     try {
       const {
         prompt,
         aspectRatio = '16:9',
         imageSize = '2K',
-        model = 'gemini-3-pro-image-preview',
+        model = 'gemini-3-pro-image',
         referenceAssetUrl,
         referenceBase64,
         referenceMimeType,
@@ -228,9 +228,9 @@ async function startServer() {
       const validSizes = ['1K', '2K', '4K'];
       const safeRatio = validRatios.includes(aspectRatio) ? aspectRatio : '16:9';
       const safeSize = validSizes.includes(imageSize) ? imageSize : '2K';
-      const safeModel = ['gemini-3-pro-image-preview', 'gemini-nano-banana-2.1'].includes(model)
+      const safeModel = ['gemini-3-pro-image', 'gemini-nano-banana-2.1'].includes(model)
         ? model
-        : 'gemini-3-pro-image-preview';
+        : 'gemini-3-pro-image';
 
       const parts: Array<{ text?: string; inlineData?: { data: string; mimeType: string } }> = [];
 
@@ -601,6 +601,7 @@ async function startServer() {
           systemInstruction:
             'You are a planetary terrain data researcher supporting Rocket Academy: First Contact. Cite authoritative NASA, USGS, LRO LOLA, MRO HiRISE, and robotics simulation datasets clearly.',
           tools: [{ googleSearch: {} }],
+          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
         },
       });
 
@@ -641,6 +642,7 @@ async function startServer() {
         contents: query.trim(),
         config: {
           tools: [{ googleMaps: {} }],
+          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
           ...(latLng
             ? {
                 toolConfig: {

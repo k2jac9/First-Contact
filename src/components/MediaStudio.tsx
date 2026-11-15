@@ -55,7 +55,7 @@ export const MediaStudio: React.FC<MediaStudioProps> = ({ initialScene }) => {
   const [mode, setMode] = useState<StudioMode>('image');
 
   // Image generation state
-  const [imageModel, setImageModel] = useState<'gemini-3-pro-image-preview' | 'gemini-nano-banana-2.1'>('gemini-3-pro-image-preview');
+  const [imageModel, setImageModel] = useState<'gemini-3-pro-image' | 'gemini-nano-banana-2.1'>('gemini-3-pro-image');
   const [aspectRatio, setAspectRatio] = useState<AllowedAspectRatio>('16:9');
   const [imageSize, setImageSize] = useState<AllowedImageSize>('2K');
   const [imagePrompt, setImagePrompt] = useState<string>(
@@ -378,9 +378,9 @@ export const MediaStudio: React.FC<MediaStudioProps> = ({ initialScene }) => {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setImageModel('gemini-3-pro-image-preview')}
+                  onClick={() => setImageModel('gemini-3-pro-image')}
                   className={`rounded-md border px-3 py-2 text-xs font-medium transition-colors ${
-                    imageModel === 'gemini-3-pro-image-preview'
+                    imageModel === 'gemini-3-pro-image'
                       ? 'border-cyan-400 bg-cyan-500/15 text-cyan-200'
                       : 'border-slate-800 bg-[#07090E] text-slate-400 hover:text-slate-200'
                   }`}

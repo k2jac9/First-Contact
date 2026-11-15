@@ -1,0 +1,6 @@
+{
+  "name": "Rocket Academy: First Contact",
+  "description": "60-second autonomous robotics concept film and Gemini-powered production studio for Earth, Moon, and Mars terrain simulation.",
+  "requestFramePermissions": ["microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
